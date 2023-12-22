@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #f0f3c1;
+            color: #1e5550;
+            text-align: center;
+            padding: 1rem;
+            width: 100%;
+        }
+
+        main {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        nav {
+            background-color: #c9f5a5;
+            padding: 20px;
+            width: 20%;
+        }
+
+        .topics-list {
+            list-style: disc;
+            padding: 0;
+            margin: 0;
+        }
+
+        .topics-list li {
+            margin-bottom: 10px;
+        }
+
+        .subheadings-list {
+            list-style: circle;
+            padding: 0;
+            margin: 0;
+            margin-left: 20px; /* Adjusted margin for subheadings */
+            display: none; /* Initially hide subheadings */
+        }
+
+        .subheadings-list li {
+            margin-bottom: 5px;
+        }
+
+        .pdf-container {
+            flex-grow: 1;
+            margin: 20px;
+        }
+
+        object {
+            width: 100%;
+            height: calc(100vh - 40px); /* Adjusted for margin in .pdf-container */
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ethics in AI</h1>
+    </header>
+
+    <main>
+        <!-- Navigation List -->
+        <nav>
+            <h2>Student's Project</h2>
+            <ul class="topics-list" id="topicsList"></ul>
+        </nav>
+
+        <!-- PDF Viewer Container -->
+        <div class="pdf-container">
+            <object id="pdfViewer" data="" type="application/pdf">
+                <p>PDF viewer will be displayed here. <a href="" id="downloadLink" download>Download</a></p>
+            </object>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2023 Ethics in AI
+    </footer>
+
+    <script>
+        var numTopics = 12; // Set the number of topics here
+        var topicsList = document.getElementById('topicsList');
+    
+        // Generate topics dynamically
+        for (var i = 1; i <= numTopics; i++) {
+            var topicListItem = document.createElement('li');
+            var topicLink = document.createElement('a');
+            topicLink.href = '#';
+            topicLink.textContent = 'Group' + i;
+            (function(i) {
+                topicLink.onclick = function () { showSubheadings(this); };
+            })(i);
+            
+            topicListItem.appendChild(topicLink);
+    
+            var subheadingsList = document.createElement('ul');
+            subheadingsList.className = 'subheadings-list';
+            subheadingsList.id = 'subheadingsListGroup' + i; // Adjusted ID for subheadings list
+          
+            // Generate subheadings dynamically
+            ['Presentation Slides', 'Report'].forEach(function (subheading) {
+                var subheadingListItem = document.createElement('li');
+                var subheadingLink = document.createElement('a');
+                subheadingLink.textContent = subheading;
+                subheadingLink.href = '#';
+
+                // Use an IIFE to create a new scope for each iteration
+                (function(group, subheading) {
+                    subheadingLink.onclick = function (event) { event.stopPropagation(); showPdf(group, subheading); };
+                })(topicLink.textContent, subheading);
+
+                subheadingListItem.appendChild(subheadingLink);
+                subheadingsList.appendChild(subheadingListItem);
+            });
+            
+            topicListItem.appendChild(subheadingsList);
+            topicsList.appendChild(topicListItem);
+        }
+        
+    
+        function showSubheadings(topicLink) {
+            // Prevent the event from bubbling up to the subheadings list
+            if (event) {
+                event.stopPropagation();
+            }
+        
+            // Get all subheadings lists
+            var allSubheadingsLists = document.getElementsByClassName('subheadings-list');
+        
+            // Hide all subheadings lists
+            for (var i = 0; i < allSubheadingsLists.length; i++) {
+                allSubheadingsLists[i].style.display = 'none';
+            }
+        
+            // Show the subheadings list for the clicked topic
+            var subheadingsList = topicLink.nextElementSibling; // Get the next sibling, which is the subheadings list
+            subheadingsList.style.display = 'block';
+        }
+    
+        function showPdf(group, subheading) {
+            var pdfViewer = document.getElementById('pdfViewer');
+            var downloadLink = document.getElementById('downloadLink');
+        
+            // Update the PDF file and download link based on the selected group and subheading
+            var pdfPath = './pdfs/' + group.replace(/\s+/g, '') + '_' + subheading.replace(/\s+/g, '') + '.pdf';
+        
+            // Add a timestamp to the PDF path
+            var pdfPathWithTimestamp = pdfPath + '?t=' + new Date().getTime();
+        
+            // Update the PDF viewer and download link
+            pdfViewer.data = '';
+            pdfViewer.data = pdfPathWithTimestamp;
+            downloadLink.href = pdfPathWithTimestamp;
+        }
+    </script>
+
+
+</body>
+</html>
